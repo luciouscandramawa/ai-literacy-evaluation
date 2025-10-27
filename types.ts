@@ -1,4 +1,3 @@
-
 export enum QuestionType {
   Explicit = 'Explicit Information',
   Implicit = 'Implicit Information',
@@ -41,4 +40,16 @@ export interface EvaluationResult {
     title: string;
     reason: string;
   }[];
+}
+
+export type MaterialContent =
+  | { type: 'text'; text: string }
+  | { type: 'pdf'; file: File }
+  | { type: 'file'; file: File }
+  | { type: 'url'; url: string };
+
+export interface ReadingMaterial {
+  id: string;
+  title: string;
+  content: MaterialContent;
 }

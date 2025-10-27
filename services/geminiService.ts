@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { SessionData, EvaluationResult, QuestionType, UserAnswers, Question } from '../types';
 
@@ -8,16 +7,12 @@ if (!process.env.API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const readingSessionSchema = {
+const questionsOnlySchema = {
   type: Type.OBJECT,
   properties: {
-    passage: {
-      type: Type.STRING,
-      description: "A 300-400 word article on the given topic, suitable for a 14-year-old student. The tone should be informative and engaging."
-    },
     questions: {
       type: Type.ARRAY,
-      description: "An array of 4 questions based on the passage.",
+      description: "An array of 4 questions based on the provided passage.",
       items: {
         type: Type.OBJECT,
         properties: {
@@ -41,27 +36,47 @@ const readingSessionSchema = {
       }
     }
   },
-  required: ["passage", "questions"]
+  required: ["questions"]
 };
 
-export const generateReadingSession = async (topic: string): Promise<SessionData> => {
+export const getTextFromUrl = async (url: string): Promise<string> => {
+    const prompt = `
+      Please act as a web content extractor. Your task is to extract the main article content from the following URL: ${url}.
+      Focus exclusively on the primary text of the article.
+      You MUST exclude all of the following: headers, footers, navigation menus, sidebars, advertisements, and comment sections.
+      Return only the clean, unformatted, plain text of the article. If you cannot access the URL or find an article, return an empty string.
+    `;
+  
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        tools: [{googleSearch: {}}],
+      },
+    });
+    
+    return response.text;
+  };
+
+export const generateReadingSession = async (passage: string): Promise<SessionData> => {
   const prompt = `
-    You are an AI assistant for an educational platform. Your task is to help a 14-year-old student named Hana improve her reading comprehension.
+    You are an AI assistant for an educational platform. Your task is to help a 14-year-old student named Hana improve her reading comprehension based on a passage provided by their instructor.
     
-    Please generate a complete reading session based on the topic: "${topic}".
+    Here is the reading passage:
+    ---
+    ${passage}
+    ---
     
-    The session must include:
-    1.  A reading passage of about 300-400 words. It should be informative, well-structured, and written at a level appropriate for a 14-year-old.
-    2.  Exactly four questions based on the passage, with one question for each of the following types:
-        -   '${QuestionType.Explicit}': Asks about information stated directly in the text.
-        -   '${QuestionType.Implicit}': Asks the reader to infer meaning that is not directly stated.
-        -   '${QuestionType.Critical}': Asks for an opinion, evaluation, or real-world application of the text's ideas. This must be an open-ended question (no multiple-choice options).
-        -   '${QuestionType.Vocabulary}': Asks for the meaning of a specific word from the passage in its context.
+    Please generate exactly four questions based on the passage, with one question for each of the following types:
+    -   '${QuestionType.Explicit}': Asks about information stated directly in the text.
+    -   '${QuestionType.Implicit}': Asks the reader to infer meaning that is not directly stated.
+    -   '${QuestionType.Critical}': Asks for an opinion, evaluation, or real-world application of the text's ideas. This must be an open-ended question (no multiple-choice options).
+    -   '${QuestionType.Vocabulary}': Asks for the meaning of a specific word from the passage in its context.
 
     For all multiple-choice questions, provide 4 plausible options, with only one being correct.
     For the critical thinking question, provide a model answer as the 'correctAnswer'.
 
-    Return the entire session as a single JSON object matching the provided schema. Ensure the question IDs are 'q1', 'q2', 'q3', and 'q4'.
+    Return the questions as a single JSON object matching the provided schema. Ensure the question IDs are 'q1', 'q2', 'q3', and 'q4'.
   `;
 
   const response = await ai.models.generateContent({
@@ -69,7 +84,7 @@ export const generateReadingSession = async (topic: string): Promise<SessionData
     contents: prompt,
     config: {
       responseMimeType: "application/json",
-      responseSchema: readingSessionSchema,
+      responseSchema: questionsOnlySchema,
     },
   });
 
@@ -78,7 +93,9 @@ export const generateReadingSession = async (topic: string): Promise<SessionData
   jsonResponse.questions.forEach((q: any) => {
     q.type = q.type as QuestionType;
   });
-  return jsonResponse as SessionData;
+
+  // Combine the original passage with the generated questions
+  return { passage, questions: jsonResponse.questions } as SessionData;
 };
 
 const evaluationSchema = {

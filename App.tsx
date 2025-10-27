@@ -1,36 +1,98 @@
 import React, { useState, useCallback } from 'react';
-import { SessionData, EvaluationResult, UserAnswers } from './types';
-import { generateReadingSession, evaluateAnswers } from './services/geminiService';
-import TopicSelector from './components/TopicSelector';
+import { SessionData, EvaluationResult, UserAnswers, ReadingMaterial, MaterialContent } from './types';
+import { generateReadingSession, evaluateAnswers, getTextFromUrl } from './services/geminiService';
+import { extractTextFromPdf, extractTextFromDocx } from './services/fileService';
 import ReadingSession from './components/ReadingSession';
 import ResultsScreen from './components/ResultsScreen';
 import LoadingSpinner from './components/LoadingSpinner';
+import RoleSelector from './components/RoleSelector';
+import StudentDashboard from './components/StudentDashboard';
+import InstructorDashboard from './components/InstructorDashboard';
 
-type AppState = 'topic_selection' | 'reading_session' | 'results' | 'loading' | 'error';
+type AppState = 'role_selection' | 'student_dashboard' | 'instructor_dashboard' | 'reading_session' | 'results' | 'loading' | 'error';
+type Role = 'student' | 'instructor';
+
+const initialMaterials: ReadingMaterial[] = [
+  {
+    id: 'initial-1',
+    title: 'The Rise of Artificial Intelligence',
+    content: {
+        type: 'text',
+        text: `Artificial intelligence (AI) is a transformative field of computer science that has captured the public imagination. At its core, AI involves creating machines that can perform tasks that typically require human intelligence. This includes learning from experience, understanding language, recognizing patterns, and solving complex problems. The roots of AI trace back to the mid-20th century, but recent advancements in computing power and the availability of massive datasets have led to an explosion in its capabilities.
+
+One of the most significant subfields of AI is machine learning, where algorithms are trained on data to make predictions or decisions without being explicitly programmed for the task. For example, a machine learning model can be shown thousands of cat photos to learn how to identify a cat in a new, unseen picture. This technology powers everything from your social media feed to advanced medical diagnostics. Another exciting area is Natural Language Processing (NLP), which enables computers to understand, interpret, and generate human language, making technologies like voice assistants and translation services possible. As AI continues to evolve, it promises to revolutionize industries, though it also raises important ethical questions about privacy, bias, and the future of work that society must address.`
+    }
+  }
+];
 
 const App: React.FC = () => {
-  const [appState, setAppState] = useState<AppState>('topic_selection');
+  const [appState, setAppState] = useState<AppState>('role_selection');
+  const [loadingMessage, setLoadingMessage] = useState('AI is generating questions...');
+  const [readingMaterials, setReadingMaterials] = useState<ReadingMaterial[]>(initialMaterials);
+  const [selectedMaterial, setSelectedMaterial] = useState<ReadingMaterial | null>(null);
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const handleTopicSelect = useCallback(async (topic: string) => {
+  const handleRoleSelect = (role: Role) => {
+    if (role === 'student') {
+      setAppState('student_dashboard');
+    } else {
+      setAppState('instructor_dashboard');
+    }
+  };
+
+  const handleMaterialSelect = useCallback(async (material: ReadingMaterial) => {
     setAppState('loading');
     setErrorMessage('');
+    setSelectedMaterial(material);
     try {
-      const data = await generateReadingSession(topic);
+      let passage = '';
+      if (material.content.type === 'text') {
+        setLoadingMessage('AI is generating questions...');
+        passage = material.content.text;
+      } else if (material.content.type === 'pdf') {
+        setLoadingMessage('Extracting text from PDF...');
+        passage = await extractTextFromPdf(material.content.file);
+        setLoadingMessage('AI is generating questions...');
+      } else if (material.content.type === 'file') {
+        setLoadingMessage('Extracting text from file...');
+        passage = await extractTextFromDocx(material.content.file);
+        setLoadingMessage('AI is generating questions...');
+      } else if (material.content.type === 'url') {
+        setLoadingMessage('Extracting text from URL...');
+        passage = await getTextFromUrl(material.content.url);
+        setLoadingMessage('AI is generating questions...');
+      }
+
+      if (!passage || passage.trim().length < 50) {
+        throw new Error("Could not extract sufficient text from the material. The file might be empty, corrupted, or the URL may not contain a readable article.");
+      }
+
+      const data = await generateReadingSession(passage);
       setSessionData(data);
       setAppState('reading_session');
     } catch (error) {
       console.error('Failed to generate reading session:', error);
-      setErrorMessage('Sorry, we couldn\'t generate a reading session. Please try again.');
+      const message = error instanceof Error ? error.message : 'Sorry, we couldn\'t prepare the reading session. Please try again.';
+      setErrorMessage(message);
       setAppState('error');
     }
   }, []);
+  
+  const handleAddMaterial = (title: string, content: MaterialContent) => {
+    const newMaterial: ReadingMaterial = {
+      id: `material-${Date.now()}`,
+      title,
+      content,
+    };
+    setReadingMaterials(prev => [...prev, newMaterial]);
+  };
 
   const handleSubmitAnswers = useCallback(async (answers: UserAnswers) => {
     if (!sessionData) return;
     setAppState('loading');
+    setLoadingMessage('Evaluating your answers...');
     setErrorMessage('');
     try {
       const result = await evaluateAnswers(sessionData.passage, sessionData.questions, answers);
@@ -47,25 +109,38 @@ const App: React.FC = () => {
     setSessionData(null);
     setEvaluationResult(null);
     setErrorMessage('');
-    setAppState('topic_selection');
+    setSelectedMaterial(null);
+    setAppState('student_dashboard');
+  };
+  
+  const handleGoToRoleSelection = () => {
+    setSessionData(null);
+    setEvaluationResult(null);
+    setErrorMessage('');
+    setSelectedMaterial(null);
+    setAppState('role_selection');
   };
 
   const renderContent = () => {
     switch (appState) {
       case 'loading':
-        return <div className="flex flex-col items-center justify-center min-h-[80vh]"><LoadingSpinner /><p className="mt-4 text-gray-400">AI is thinking...</p></div>;
-      case 'topic_selection':
-        return <TopicSelector onTopicSelect={handleTopicSelect} />;
+        return <div className="flex flex-col items-center justify-center min-h-[80vh]"><LoadingSpinner /><p className="mt-4 text-gray-400">{loadingMessage}</p></div>;
+      case 'role_selection':
+        return <RoleSelector onSelectRole={handleRoleSelect} />;
+      case 'student_dashboard':
+        return <StudentDashboard materials={readingMaterials} onSelectMaterial={handleMaterialSelect} />;
+      case 'instructor_dashboard':
+        return <InstructorDashboard materials={readingMaterials} onAddMaterial={handleAddMaterial} />;
       case 'reading_session':
-        if (sessionData) {
-          return <ReadingSession sessionData={sessionData} onSubmit={handleSubmitAnswers} />;
+        if (sessionData && selectedMaterial) {
+          return <ReadingSession sessionData={sessionData} material={selectedMaterial} onSubmit={handleSubmitAnswers} />;
         }
-        return null; // Should not happen
+        return null;
       case 'results':
         if (evaluationResult) {
           return <ResultsScreen result={evaluationResult} onRestart={handleRestart} />;
         }
-        return null; // Should not happen
+        return null;
       case 'error':
         return (
           <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4 bg-gray-800 rounded-lg">
@@ -80,7 +155,7 @@ const App: React.FC = () => {
           </div>
         );
       default:
-        return <TopicSelector onTopicSelect={handleTopicSelect} />;
+        return <RoleSelector onSelectRole={handleRoleSelect} />;
     }
   };
 
@@ -88,7 +163,17 @@ const App: React.FC = () => {
     <div className="min-h-screen font-sans bg-gray-900">
       <header className="bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-700">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-100 tracking-tight">AI Reading Evaluation</h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-gray-100 tracking-tight">AI Reading Evaluation</h1>
+              {appState !== 'role_selection' && (
+                  <button 
+                    onClick={handleGoToRoleSelection}
+                    className="px-4 py-2 text-sm bg-gray-700 text-gray-300 font-semibold rounded-lg shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  >
+                    Switch Role
+                  </button>
+              )}
+            </div>
         </div>
       </header>
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

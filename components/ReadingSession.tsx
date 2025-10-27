@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { SessionData, UserAnswers, QuestionType } from '../types';
+import { SessionData, UserAnswers, ReadingMaterial } from '../types';
 import QuestionCard from './QuestionCard';
+import PdfViewer from './PdfViewer';
 
 interface ReadingSessionProps {
   sessionData: SessionData;
+  material: ReadingMaterial;
   onSubmit: (answers: UserAnswers) => void;
 }
 
-const ReadingSession: React.FC<ReadingSessionProps> = ({ sessionData, onSubmit }) => {
+const ReadingSession: React.FC<ReadingSessionProps> = ({ sessionData, material, onSubmit }) => {
   const [answers, setAnswers] = useState<UserAnswers>({});
 
   const handleAnswerChange = (questionId: string, answer: string) => {
@@ -22,24 +24,39 @@ const ReadingSession: React.FC<ReadingSessionProps> = ({ sessionData, onSubmit }
       alert('Please answer all questions before submitting.');
     }
   };
+
+  const renderPassage = () => {
+    switch (material.content.type) {
+      case 'text':
+      case 'url':
+      case 'file': // File content is also pre-fetched as text.
+        return (
+          <div className="prose prose-invert max-w-none prose-p:text-gray-300 prose-p:leading-relaxed font-serif">
+            {sessionData.passage.split('\n\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+        );
+      case 'pdf':
+        return <PdfViewer file={material.content.file} />;
+      default:
+        return <p>Unsupported material type.</p>;
+    }
+  };
   
   return (
     <div className="space-y-12">
       <article className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-lg">
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-6">
             <div className="p-3 bg-violet-500/20 rounded-lg mr-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
             <div>
                  <h2 className="text-2xl font-bold font-serif text-gray-100">Reading Passage</h2>
-                 <p className="text-violet-400 font-medium">Topic: Science</p>
+                 <p className="text-violet-400 font-medium">{material.title}</p>
             </div>
         </div>
-        <div className="prose prose-invert max-w-none prose-p:text-gray-300 prose-p:leading-relaxed font-serif">
-          {sessionData.passage.split('\n\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-        </div>
+        {renderPassage()}
       </article>
 
       <form onSubmit={handleSubmit} className="space-y-8">
