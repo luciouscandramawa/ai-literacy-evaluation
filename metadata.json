@@ -1,0 +1,5 @@
+{
+  "name": "AI Literacy & Reading Evaluation System",
+  "description": "An interactive web app that helps students improve their reading comprehension. It uses AI to generate age-appropriate articles and questions, provides instant feedback on answers, and offers personalized recommendations for growth.",
+  "requestFramePermissions": []
+}
