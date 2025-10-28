@@ -29,7 +29,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ materials, onSelect
           {materials.map((material) => (
             <div
               key={material.id}
-              className="bg-gray-800 p-6 rounded-lg shadow-md flex items-center justify-between"
+              className="bg-brand-container p-6 rounded-lg shadow-md flex items-center justify-between"
             >
               <div className="flex items-center">
                 <span className={`text-xs font-medium mr-4 px-2.5 py-1 rounded-full ${getBadgeStyle(material.content.type)}`}>
@@ -39,7 +39,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ materials, onSelect
               </div>
               <button
                 onClick={() => onSelectMaterial(material)}
-                className="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
+                className="px-6 py-2 bg-brand-accent text-white font-semibold rounded-lg shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-text-accent focus:ring-offset-2 focus:ring-offset-brand-bg transition-colors"
               >
                 Start Reading
               </button>
@@ -47,7 +47,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ materials, onSelect
           ))}
         </div>
       ) : (
-        <div className="text-center bg-gray-800 p-8 rounded-lg">
+        <div className="text-center bg-brand-container p-8 rounded-lg">
            <h3 className="text-xl font-semibold text-gray-100">No materials available yet.</h3>
            <p className="text-gray-400 mt-2">Please ask your instructor to add some reading content.</p>
         </div>

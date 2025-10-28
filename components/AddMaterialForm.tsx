@@ -103,14 +103,14 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                         rows={8}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition bg-gray-700 text-gray-200 placeholder-gray-500"
+                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-brand-text-accent focus:border-brand-text-accent transition bg-brand-input-base text-gray-200 placeholder-gray-500"
                         placeholder="Paste the full text of the article here..."
                     />
                 );
             case 'file':
                 return (
                     <div className="flex items-center justify-center w-full">
-                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/50 hover:bg-gray-700">
+                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-brand-input-base/50 hover:bg-brand-input-base">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <svg className="w-8 h-8 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
                                 {file ? (
@@ -136,7 +136,7 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                         id="url"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
-                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition bg-gray-700 text-gray-200 placeholder-gray-500"
+                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-brand-text-accent focus:border-brand-text-accent transition bg-brand-input-base text-gray-200 placeholder-gray-500"
                         placeholder="https://example.com/article"
                     />
                 );
@@ -145,7 +145,7 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
     };
     
     return (
-        <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
+        <div className="bg-brand-container p-8 rounded-xl shadow-lg">
             <h2 className="text-3xl font-bold mb-6 text-gray-100">Add New Reading Material</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -155,7 +155,7 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                         id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition bg-gray-700 text-gray-200 placeholder-gray-500"
+                        className="w-full p-3 border border-gray-600 rounded-md focus:ring-2 focus:ring-brand-text-accent focus:border-brand-text-accent transition bg-brand-input-base text-gray-200 placeholder-gray-500"
                         placeholder="e.g., The History of Space Exploration"
                     />
                 </div>
@@ -171,7 +171,7 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                     <button
                         type="submit"
                         disabled={isSubmitDisabled}
-                        className="px-8 py-3 bg-violet-600 text-white font-bold rounded-lg shadow-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                        className="px-8 py-3 bg-brand-accent text-white font-bold rounded-lg shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-text-accent focus:ring-offset-2 focus:ring-offset-brand-bg transition-colors disabled:bg-brand-accent-disabled disabled:cursor-not-allowed"
                     >
                         Add Material
                     </button>
@@ -196,7 +196,7 @@ const TabButton: React.FC<TabButtonProps> = ({ id, currentMode, setMode, childre
             type="button"
             onClick={() => !disabled && setMode(id)}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors
-                ${currentMode === id ? 'border-violet-500 text-violet-400' : 'border-transparent text-gray-400 hover:text-gray-200'}
+                ${currentMode === id ? 'border-brand-text-accent text-brand-accent' : 'border-transparent text-gray-400 hover:text-gray-200'}
                 ${disabled ? 'cursor-not-allowed text-gray-600' : ''}
             `}
             disabled={disabled}

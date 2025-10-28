@@ -8,15 +8,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <link href="https://font.elice.io/css?family=Elice+DX+Neolli" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
+              sans: ['"Elice DX Neolli"', 'sans-serif'],
               serif: ['Lora', 'serif'],
             },
+            colors: {
+              'brand-bg': '#22222B',
+              'brand-container': '#2E2E3B',
+              'brand-accent': '#514F9C',
+              'brand-accent-disabled': '#403F6C',
+              'brand-text-accent': '#7353EA',
+              'brand-button-base': '#48485A',
+              'brand-input-base': '#3A3A4B',
+            }
           },
         },
       }
@@ -35,7 +45,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-900 text-gray-200">
+  <body class="bg-brand-bg text-gray-200 font-sans">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -156,12 +156,12 @@ const App: React.FC = () => {
         return null;
       case 'error':
         return (
-          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4 bg-gray-800 rounded-lg">
+          <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4 bg-brand-container rounded-lg">
             <h2 className="text-2xl font-bold text-red-500 mb-4">An Error Occurred</h2>
             <p className="text-gray-400 mb-6">{errorMessage}</p>
             <button
               onClick={handleRestart}
-              className="px-6 py-2 bg-violet-600 text-white font-semibold rounded-lg shadow-md hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+              className="px-6 py-2 bg-brand-accent text-white font-semibold rounded-lg shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-text-accent focus:ring-offset-2 focus:ring-offset-brand-bg"
             >
               Try Again
             </button>
@@ -173,15 +173,15 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-gray-900">
-      <header className="bg-gray-800/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-700">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen">
+      <header className="bg-brand-container/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-100 tracking-tight">AI Reading Evaluation</h1>
               {appState !== 'role_selection' && (
                   <button 
                     onClick={handleGoToRoleSelection}
-                    className="px-4 py-2 text-sm bg-gray-700 text-gray-300 font-semibold rounded-lg shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    className="px-4 py-2 text-sm bg-brand-button-base text-gray-300 font-semibold rounded-lg shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-text-accent focus:ring-offset-2 focus:ring-offset-brand-bg"
                   >
                     Switch Role
                   </button>
@@ -189,7 +189,7 @@ const App: React.FC = () => {
             </div>
         </div>
       </header>
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {renderContent()}
       </main>
     </div>

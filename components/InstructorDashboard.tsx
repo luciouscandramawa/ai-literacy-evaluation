@@ -23,12 +23,12 @@ const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ materials, on
     <div className="space-y-12 animate-fade-in">
       <AddMaterialForm onAddMaterial={onAddMaterial} />
 
-      <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
+      <div className="bg-brand-container p-8 rounded-xl shadow-lg">
         <h2 className="text-3xl font-bold mb-6 text-gray-100">Existing Materials</h2>
         {materials.length > 0 ? (
           <ul className="space-y-3">
             {materials.map(material => (
-              <li key={material.id} className="p-4 bg-gray-700/50 rounded-md flex items-center justify-between">
+              <li key={material.id} className="p-4 bg-brand-input-base/50 rounded-md flex items-center justify-between">
                 <span className="text-gray-200">{material.title}</span>
                 <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${getBadgeStyle(material.content.type)}`}>
                   {material.content.type.toUpperCase()}

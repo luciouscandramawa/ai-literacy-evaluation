@@ -35,7 +35,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 bg-gray-700/50 rounded-md">
+      <div className="flex flex-col items-center justify-center h-96 bg-black/20 rounded-md">
         <LoadingSpinner />
         <p className="mt-4 text-gray-400">Loading PDF preview...</p>
       </div>
@@ -55,7 +55,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ file }) => {
   }
 
   return (
-    <div className="space-y-4 bg-gray-900 p-2 sm:p-4 rounded-md">
+    <div className="space-y-4 bg-black/20 p-2 sm:p-4 rounded-md">
       {Array.from(new Array(pdf.numPages), (el, index) => (
         <PdfPage key={`page_${index + 1}`} pdf={pdf} pageNumber={index + 1} />
       ))}

@@ -24,9 +24,9 @@ const FeedbackCard: React.FC<{ feedbackItem: Feedback }> = ({ feedbackItem }) =>
 const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="text-center bg-gray-800 p-8 rounded-xl shadow-lg">
+      <div className="text-center bg-brand-container p-8 rounded-xl shadow-lg">
         <h2 className="text-4xl font-bold text-gray-100">Your Results</h2>
-        <p className="text-6xl font-bold my-4 text-violet-400">
+        <p className="text-6xl font-bold my-4 text-brand-text-accent">
           {result.score} <span className="text-4xl text-gray-500">/ {result.totalQuestions}</span>
         </p>
         <p className="text-xl text-gray-300">
@@ -35,18 +35,18 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-green-400 mb-3">Strengths</h3>
+        <div className="bg-brand-container p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-brand-text-accent mb-3">Strengths</h3>
           <p className="text-gray-300">{result.strengths}</p>
         </div>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-yellow-400 mb-3">Areas for Growth</h3>
+        <div className="bg-brand-container p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-brand-text-accent mb-3">Areas for Growth</h3>
           <p className="text-gray-300">{result.areasForGrowth}</p>
         </div>
       </div>
 
       <div>
-        <h3 className="text-2xl font-bold mb-4 font-serif text-gray-100">Detailed Feedback</h3>
+        <h3 className="text-2xl font-bold mb-4 text-gray-100">Detailed Feedback</h3>
         <div className="space-y-4">
           {result.feedback.map(fb => (
             <FeedbackCard key={fb.questionId} feedbackItem={fb} />
@@ -55,13 +55,13 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
       </div>
 
       <div>
-        <h3 className="text-2xl font-bold mb-4 font-serif text-gray-100">Next Steps</h3>
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+        <h3 className="text-2xl font-bold mb-4 text-gray-100">Next Steps</h3>
+        <div className="bg-brand-container p-6 rounded-lg shadow-md">
           <p className="font-semibold text-gray-100 mb-3">Here are some recommended topics to practice your skills:</p>
           <ul className="list-disc list-inside space-y-2 text-gray-300">
             {result.recommendations.map((rec, index) => (
               <li key={index}>
-                <span className="font-semibold text-violet-300">{rec.title}:</span> {rec.reason}
+                <span className="font-semibold text-brand-text-accent">{rec.title}:</span> {rec.reason}
               </li>
             ))}
           </ul>
@@ -71,7 +71,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
       <div className="text-center pt-8">
         <button
           onClick={onRestart}
-          className="px-8 py-3 bg-violet-600 text-white font-bold rounded-lg shadow-lg hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
+          className="px-8 py-3 bg-brand-accent text-white font-bold rounded-lg shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-brand-text-accent focus:ring-offset-2 focus:ring-offset-brand-bg transition-colors"
         >
           Try Another Topic
         </button>
