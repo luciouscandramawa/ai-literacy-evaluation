@@ -59,11 +59,13 @@ export const getTextFromUrl = async (url: string): Promise<string> => {
       },
     });
     
-    const text = response.text.trim();
-    if (text === 'ERROR::EXTRACT_FAILED') {
+    const text = response.text || '';
+    const trimmedText = text.trim();
+    
+    if (trimmedText === 'ERROR::EXTRACT_FAILED') {
       return '';
     }
-    return text;
+    return trimmedText;
 };
 
 export const generateReadingSession = async (passage: string): Promise<SessionData> => {
@@ -96,7 +98,12 @@ export const generateReadingSession = async (passage: string): Promise<SessionDa
     },
   });
 
-  const jsonResponse = JSON.parse(response.text);
+  const responseText = response.text;
+  if (!responseText) {
+    throw new Error("The AI model returned an empty response when generating questions. This might be due to content safety filters or a temporary issue. Please try again with different content.");
+  }
+
+  const jsonResponse = JSON.parse(responseText);
   // Ensure question types are correctly cast from string
   jsonResponse.questions.forEach((q: any) => {
     q.type = q.type as QuestionType;
@@ -186,5 +193,10 @@ export const evaluateAnswers = async (passage: string, questions: Question[], an
     },
   });
 
-  return JSON.parse(response.text) as EvaluationResult;
+  const responseText = response.text;
+  if (!responseText) {
+      throw new Error("The AI model returned an empty response while evaluating answers. Please try again.");
+  }
+
+  return JSON.parse(responseText) as EvaluationResult;
 };
