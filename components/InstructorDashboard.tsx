@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReadingMaterial, MaterialContent } from '../types';
 import AddMaterialForm from './AddMaterialForm';
+import { getBadgeStyle } from '../utils/styleUtils';
 
 interface InstructorDashboardProps {
   materials: ReadingMaterial[];
@@ -8,17 +9,6 @@ interface InstructorDashboardProps {
 }
 
 const InstructorDashboard: React.FC<InstructorDashboardProps> = ({ materials, onAddMaterial }) => {
-  const getBadgeStyle = (type: string) => {
-    switch(type) {
-      case 'pdf': return 'bg-blue-900 text-blue-300';
-      case 'file': return 'bg-indigo-900 text-indigo-300';
-      case 'url': return 'bg-yellow-900 text-yellow-300';
-      case 'text':
-      default:
-        return 'bg-green-900 text-green-300';
-    }
-  };
-
   return (
     <div className="space-y-12 animate-fade-in">
       <AddMaterialForm onAddMaterial={onAddMaterial} />

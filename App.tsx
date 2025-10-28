@@ -48,21 +48,25 @@ const App: React.FC = () => {
     setSelectedMaterial(material);
     try {
       let passage = '';
-      if (material.content.type === 'text') {
-        setLoadingMessage('AI is generating questions...');
-        passage = material.content.text;
-      } else if (material.content.type === 'pdf') {
-        setLoadingMessage('Extracting text from PDF...');
-        passage = await extractTextFromPdf(material.content.file);
-        setLoadingMessage('AI is generating questions...');
-      } else if (material.content.type === 'file') {
-        setLoadingMessage('Extracting text from file...');
-        passage = await extractTextFromDocx(material.content.file);
-        setLoadingMessage('AI is generating questions...');
-      } else if (material.content.type === 'url') {
-        setLoadingMessage('Extracting text from URL...');
-        passage = await getTextFromUrl(material.content.url);
-        setLoadingMessage('AI is generating questions...');
+      const content = material.content;
+
+      switch(content.type) {
+        case 'text':
+          setLoadingMessage('Preparing reading material...');
+          passage = content.text;
+          break;
+        case 'pdf':
+          setLoadingMessage('Extracting text from PDF...');
+          passage = await extractTextFromPdf(content.file);
+          break;
+        case 'file':
+          setLoadingMessage('Extracting text from file...');
+          passage = await extractTextFromDocx(content.file);
+          break;
+        case 'url':
+          setLoadingMessage('Extracting text from URL...');
+          passage = await getTextFromUrl(content.url);
+          break;
       }
 
       if (!passage || passage.trim().length < 50) {
@@ -81,7 +85,8 @@ const App: React.FC = () => {
         }
         throw new Error(specificError);
       }
-
+      
+      setLoadingMessage('AI is generating questions...');
       const data = await generateReadingSession(passage);
       setSessionData(data);
       setAppState('reading_session');

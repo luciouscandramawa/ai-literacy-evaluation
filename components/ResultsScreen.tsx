@@ -26,7 +26,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
     <div className="space-y-8 animate-fade-in">
       <div className="text-center bg-brand-container p-8 rounded-xl shadow-lg">
         <h2 className="text-4xl font-bold text-gray-100">Your Results</h2>
-        <p className="text-6xl font-bold my-4 text-brand-text-accent">
+        <p className="text-6xl font-bold my-4 text-brand-accent">
           {result.score} <span className="text-4xl text-gray-500">/ {result.totalQuestions}</span>
         </p>
         <p className="text-xl text-gray-300">
@@ -36,11 +36,11 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-brand-container p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-brand-text-accent mb-3">Strengths</h3>
+          <h3 className="text-xl font-bold text-brand-accent mb-3">Strengths</h3>
           <p className="text-gray-300">{result.strengths}</p>
         </div>
         <div className="bg-brand-container p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-bold text-brand-text-accent mb-3">Areas for Growth</h3>
+          <h3 className="text-xl font-bold text-brand-accent mb-3">Areas for Growth</h3>
           <p className="text-gray-300">{result.areasForGrowth}</p>
         </div>
       </div>
@@ -61,7 +61,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ result, onRestart }) => {
           <ul className="list-disc list-inside space-y-2 text-gray-300">
             {result.recommendations.map((rec, index) => (
               <li key={index}>
-                <span className="font-semibold text-brand-text-accent">{rec.title}:</span> {rec.reason}
+                <span className="font-semibold text-brand-accent">{rec.title}:</span> {rec.reason}
               </li>
             ))}
           </ul>
