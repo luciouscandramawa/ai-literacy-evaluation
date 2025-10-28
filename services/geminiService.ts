@@ -41,10 +41,14 @@ const questionsOnlySchema = {
 
 export const getTextFromUrl = async (url: string): Promise<string> => {
     const prompt = `
-      Please act as a web content extractor. Your task is to extract the main article content from the following URL: ${url}.
-      Focus exclusively on the primary text of the article.
-      You MUST exclude all of the following: headers, footers, navigation menus, sidebars, advertisements, and comment sections.
-      Return only the clean, unformatted, plain text of the article. If you cannot access the URL or find an article, return an empty string.
+      You are an expert web content extractor. Your task is to get the main article text from a URL.
+      URL to process: ${url}
+
+      **Instructions:**
+      1.  **Extract Main Content Only:** Focus exclusively on the primary text of the article.
+      2.  **Exclusions are Critical:** You MUST ignore and exclude all of the following: headers, footers, navigation menus, sidebars, advertisements, cookie notices, related articles links, and comment sections.
+      3.  **Output Plain Text:** Return only the clean, unformatted, plain text of the article's body.
+      4.  **Handle Failures Gracefully:** If you cannot access the URL, if the page does not contain a text-based article, if the content is behind a paywall, or if the main article text is less than 100 words, you MUST return the exact string "ERROR::EXTRACT_FAILED" and nothing else. This is a critical instruction. Do not return short error messages or snippets from the page in case of failure.
     `;
   
     const response = await ai.models.generateContent({
@@ -55,8 +59,12 @@ export const getTextFromUrl = async (url: string): Promise<string> => {
       },
     });
     
-    return response.text;
-  };
+    const text = response.text.trim();
+    if (text === 'ERROR::EXTRACT_FAILED') {
+      return '';
+    }
+    return text;
+};
 
 export const generateReadingSession = async (passage: string): Promise<SessionData> => {
   const prompt = `

@@ -66,7 +66,20 @@ const App: React.FC = () => {
       }
 
       if (!passage || passage.trim().length < 50) {
-        throw new Error("Could not extract sufficient text from the material. The file might be empty, corrupted, or the URL may not contain a readable article.");
+        let specificError = "Could not extract sufficient text from the material. The file might be empty, corrupted, or the URL may not contain a readable article."; // Fallback message
+        switch(material.content.type) {
+            case 'url':
+                specificError = "Could not extract readable text from the URL. Please check if the link is correct, publicly accessible, and points to a text-based article.";
+                break;
+            case 'pdf':
+            case 'file':
+                specificError = "Could not extract readable text from the file. The file might be empty, password-protected, corrupted, or contain only images.";
+                break;
+            case 'text':
+                 specificError = "The provided text is too short. Please provide a longer passage for analysis.";
+                 break;
+        }
+        throw new Error(specificError);
       }
 
       const data = await generateReadingSession(passage);

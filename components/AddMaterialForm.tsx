@@ -5,7 +5,7 @@ interface AddMaterialFormProps {
     onAddMaterial: (title: string, content: MaterialContent) => void;
 }
 
-type InputMode = 'text' | 'pdf' | 'file' | 'url';
+type InputMode = 'text' | 'file' | 'url';
 
 const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
     const [title, setTitle] = useState('');
@@ -42,10 +42,16 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
 
         if (mode === 'text' && text.trim()) {
             materialContent = { type: 'text', text };
-        } else if (mode === 'pdf' && file) {
-            materialContent = { type: 'pdf', file };
         } else if (mode === 'file' && file) {
-            materialContent = { type: 'file', file };
+            const fileName = file.name.toLowerCase();
+            if (fileName.endsWith('.pdf')) {
+                materialContent = { type: 'pdf', file };
+            } else if (fileName.endsWith('.docx')) {
+                materialContent = { type: 'file', file };
+            } else {
+                setError('Unsupported file type. Please upload a PDF or DOCX file.');
+                return;
+            }
         } else if (mode === 'url' && url.trim()) {
              try {
                 new URL(url); // Validate URL format
@@ -69,7 +75,6 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
         switch (mode) {
             case 'text':
                 return !text.trim();
-            case 'pdf':
             case 'file':
                 return !file;
             case 'url':
@@ -84,7 +89,6 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
     const renderTabs = () => (
         <div className="flex border-b border-gray-700 mb-6">
             <TabButton id="text" currentMode={mode} setMode={handleModeChange}>Paste Text</TabButton>
-            <TabButton id="pdf" currentMode={mode} setMode={handleModeChange}>Upload PDF</TabButton>
             <TabButton id="file" currentMode={mode} setMode={handleModeChange}>Upload File</TabButton>
             <TabButton id="url" currentMode={mode} setMode={handleModeChange}>From URL</TabButton>
         </div>
@@ -103,32 +107,10 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                         placeholder="Paste the full text of the article here..."
                     />
                 );
-            case 'pdf':
-                return (
-                    <div className="flex items-center justify-center w-full">
-                        <label htmlFor="dropzone-pdf" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/50 hover:bg-gray-700">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg className="w-8 h-8 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
-                                {file ? (
-                                    <>
-                                        <p className="mb-2 text-sm text-green-400"><span className="font-semibold">File Selected:</span> {file.name}</p>
-                                        <p className="text-xs text-gray-400">{Math.round(file.size / 1024)} KB</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="mb-2 text-sm text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p className="text-xs text-gray-400">PDF (MAX. 10MB)</p>
-                                    </>
-                                )}
-                            </div>
-                            <input id="dropzone-pdf" type="file" className="hidden" accept=".pdf" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
-                        </label>
-                    </div> 
-                );
             case 'file':
                 return (
                     <div className="flex items-center justify-center w-full">
-                        <label htmlFor="dropzone-docx" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/50 hover:bg-gray-700">
+                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-700/50 hover:bg-gray-700">
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                 <svg className="w-8 h-8 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
                                 {file ? (
@@ -139,11 +121,11 @@ const AddMaterialForm: React.FC<AddMaterialFormProps> = ({ onAddMaterial }) => {
                                 ) : (
                                     <>
                                         <p className="mb-2 text-sm text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p className="text-xs text-gray-400">DOCX (MAX. 10MB)</p>
+                                        <p className="text-xs text-gray-400">PDF or DOCX (MAX. 10MB)</p>
                                     </>
                                 )}
                             </div>
-                            <input id="dropzone-docx" type="file" className="hidden" accept=".docx" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
+                            <input id="dropzone-file" type="file" className="hidden" accept=".pdf,.docx" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
                         </label>
                     </div> 
                 );
